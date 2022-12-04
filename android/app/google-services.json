@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "23627918416",
+    "project_id": "handinneed",
+    "storage_bucket": "handinneed.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:23627918416:android:fcd31babb3c33b2c0df555",
+        "android_client_info": {
+          "package_name": "io.github.adanglol.hand_in_need"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "23627918416-4ckkujhedkd4le3pkn7jint1af4p6d7e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqCmKz_8-CqXZhXsH7b1-8qi2AL24ng2w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "23627918416-4ckkujhedkd4le3pkn7jint1af4p6d7e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

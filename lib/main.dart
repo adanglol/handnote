@@ -25,7 +25,14 @@ void main() {
     theme: ThemeData(
       primarySwatch: Colors.blue,
     ),
+
     home: const HomePage(),
+    // parameter called routes for linking different part of page like register and login
+    // takes in map as argument
+    routes: {
+      '/login/': (context) => const LoginView(),
+      '/register/': (context) => const RegisterView(),
+    },
   ));
 }
 
@@ -36,32 +43,34 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
+    //remove scaffold in our main we dont want embed others
+    return FutureBuilder(
+      // dont wanna push widgets in future builder
+      // for future references and implementation
+      future: Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
       ),
-      body: FutureBuilder(
-        future: Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        ),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.done:
-              // Check our current user logged in to our app
-              final user = FirebaseAuth.instance.currentUser;
-              // if condition check whether our user is null or not use operator if left exist take value other wise false
-              if (user?.emailVerified ?? false) {
-                print('Email has been verified'); // true
-              } else {
-                // false
-                print('You need to verify your email first');
-              }
-              return Text('Done');
-            default:
-              return const Text('Loading...');
-          }
-        },
-      ),
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.done:
+            // Check our current user logged in to our app
+            // final user = FirebaseAuth.instance.currentUser;
+            // print(user);
+            // // if condition check whether our user is null or not use operator if left exist take value other wise false
+            // if (user?.emailVerified ?? false) {
+            //   return const Text('Done');
+            // } else {
+            //   // false
+            //   // Push view onto our user using Navigate
+            //   return const VerifyEmailView();
+            // }
+            // need user login after email verfication to verify
+            return const LoginView();
+          default:
+            //instead of returning loading we can use widget to do so
+            return const CircularProgressIndicator();
+        }
+      },
     );
   }
 }

@@ -1,7 +1,8 @@
 // Widgets
-//show key word for import get only show specific part could come it handy for importing a lot
+// show key word for import get only show specific part could come it handy for importing a lot
 // You can give alias with as and name ex as devtools
-import 'dart:developer' as devtools show log;
+// print can print a object but log cannot it needs to be a string so we use .toString method that every Object class has
+import 'dart:developer' as console show log;
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -43,6 +44,7 @@ void main() {
     routes: {
       '/login/': (context) => const LoginView(),
       '/register/': (context) => const RegisterView(),
+      '/notes/': (context) => const NotesView(),
     },
   ));
 }
@@ -126,7 +128,7 @@ class _NotesViewState extends State<NotesView> {
                 case MenuAction.logout:
                   // display our alert
                   final shouldLogOut = await showLogOutDialog(context);
-                  devtools.log(shouldLogOut.toString());
+                  console.log(shouldLogOut.toString());
                   // we need to make user logout first we need set up a condition for it
                   if (shouldLogOut) {
                     // Log out our user

@@ -10,6 +10,7 @@ import 'dart:developer' as console show log;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hand_in_need/constants/routes.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -83,7 +84,7 @@ class _LoginViewState extends State<LoginView> {
                 // pushing popular term mobile dev had screen push button puts another screen on top
                 // Dart always important suffix param with commas
                 Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/notes/',
+                  notesRoute,
                   (route) => false,
                 );
               } on FirebaseAuthException catch (e) {
@@ -112,7 +113,7 @@ class _LoginViewState extends State<LoginView> {
               onPressed: () {
                 //when button press nukes the screen and displays only the route directed in this case register
                 Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/register/',
+                  registerRoute,
                   (route) => false,
                 );
               },

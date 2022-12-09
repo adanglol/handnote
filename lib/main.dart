@@ -156,7 +156,6 @@ class _NotesViewState extends State<NotesView> {
 }
 
 // Create a future function for logout that returns either true or false
-
 // show dialog - future funciton returns optional value
 // alert dialog - stateless widget defines dialouge display to user itself
 Future<bool> showLogOutDialog(BuildContext context) {

@@ -5,12 +5,10 @@
 //This is when our users want to login
 //Similar implementation to maindart with register view
 //comments provided within Main.dart to clarify code and functionality
-
-import 'dart:developer' as console show log;
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hand_in_need/constants/routes.dart';
+import '../utilities/show_error_dialogue.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -87,17 +85,36 @@ class _LoginViewState extends State<LoginView> {
                   notesRoute,
                   (route) => false,
                 );
+
+                //catching fire base auth exceptions and generic giving  3 cases and we need alert for each case
+
               } on FirebaseAuthException catch (e) {
                 // format catching specific exception with on and classname exception in handling
                 // print(e.code); errors code
                 // if statement on e.code if user not found print that user not found
                 if (e.code == 'user-not-found') {
-                  console.log('User not found');
+                  // going display alert using new function
+                  await showErrorDialog(
+                    context,
+                    'User Not Found',
+                  );
                 } else if (e.code == 'wrong-password') {
                   // another exception if user login and the password is wrong
-
-                  console.log('Wrong Password');
+                  // alert our user
+                  await showErrorDialog(
+                    context,
+                    'Looks like the password you typed was incorrect please try again',
+                  );
+                } else {
+                  //generic firebase auth error
+                  await showErrorDialog(
+                    context,
+                    'Error ${e.code}',
+                  );
                 }
+                //generic catch block any other error that our code finds out about
+              } catch (e) {
+                await showErrorDialog(context, 'Error : ${e.toString()}');
               }
             },
             child: const Text('Login'),

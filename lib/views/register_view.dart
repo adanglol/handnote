@@ -20,10 +20,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:hand_in_need/views/login_view.dart';
-
 import 'dart:developer' as console show log;
-
 import '../constants/routes.dart';
 import '../utilities/show_error_dialogue.dart';
 
@@ -101,11 +98,15 @@ class _RegisterViewState extends State<RegisterView> {
               // Also the weak password exception
               // Another exception to catch is invalid email as well
               try {
-                final userCredential = await FirebaseAuth.instance
-                    .createUserWithEmailAndPassword(
-                        email: email, password: password);
-                //Output our user input in our debug to make sure it is working like JS and console log
-                print(userCredential);
+                await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                    email: email, password: password);
+                //once user able to register we want to show verify email route so that the user can verify email \
+                // using pushnamed and not remove
+                //Instead making user press button what if we configured for it to do so
+                final user = FirebaseAuth.instance.currentUser;
+                await user?.sendEmailVerification();
+                // take you to email verify view
+                Navigator.of(context).pushNamed(verifyEmailRoute);
 
                 // three auth and generic makign 4 expections
               } on FirebaseAuthException catch (e) {
@@ -118,14 +119,11 @@ class _RegisterViewState extends State<RegisterView> {
                     'Your password appears to be weak please enter a more secure password!',
                   );
                 } else if (e.code == 'email-already-in-use') {
-                  console.log(
-                      'Cannot register user with that email already in use');
                   await showErrorDialog(
                     context,
                     'It appears this email is already in use try another email or login',
                   );
                 } else if (e.code == 'invalid-email') {
-                  console.log('Email given is invalid');
                   await showErrorDialog(
                     context,
                     'Email given is invalid please try another email',

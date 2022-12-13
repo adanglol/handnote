@@ -3,16 +3,14 @@
 // You can give alias with as and name ex as devtools
 // print can print a object but log cannot it needs to be a string so we use .toString method that every Object class has
 import 'dart:developer' as console show log;
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 // Register and Login View files for our App
 import 'package:hand_in_need/views/login_view.dart';
 import 'package:hand_in_need/views/register_view.dart';
 import 'package:hand_in_need/views/verify_email_view.dart';
-
+// API info as well as routes for various screens
 import 'constants/routes.dart';
 import 'firebase_options.dart';
 
@@ -46,6 +44,7 @@ void main() {
       loginRoute: (context) => const LoginView(),
       registerRoute: (context) => const RegisterView(),
       notesRoute: (context) => const NotesView(),
+      verifyEmailRoute: (context) => const VerifyEmailView(),
     },
   ));
 }

@@ -1,9 +1,9 @@
 //Now we will be working on email verification
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as console show log;
 
 import 'package:hand_in_need/constants/routes.dart';
+import 'package:hand_in_need/services/auth/auth_service.dart';
 
 class VerifyEmailView extends StatefulWidget {
   const VerifyEmailView({super.key});
@@ -29,17 +29,14 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
           // button will send email to verify user when pressed
           TextButton(
               onPressed: () async {
-                // Our current user
-                final user = FirebaseAuth.instance.currentUser;
-                // await and send email verification need async for future dont forget
-                await user?.sendEmailVerification();
+                await AuthService.firebase().sendEmailVerification();
               },
               child: const Text('Send Email Verification')),
           // restart button
           TextButton(
             onPressed: () async {
               // Signing out our user when they click restart button
-              await FirebaseAuth.instance.signOut();
+              await AuthService.firebase().logOut();
               // Take our user to register page
               Navigator.of(context)
                   .pushNamedAndRemoveUntil(registerRoute, (route) => false);

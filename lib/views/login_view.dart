@@ -1,13 +1,7 @@
-//import state to bring code from other developers and
-//we need import our main.dart
-//vs code shortcut ctrl . to all errors and import that code
-
-//This is when our users want to login
-//Similar implementation to maindart with register view
-//comments provided within Main.dart to clarify code and functionality
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hand_in_need/constants/routes.dart';
+import 'package:hand_in_need/services/auth/auth_exceptions.dart';
+import 'package:hand_in_need/services/auth/auth_service.dart';
 import '../utilities/show_error_dialogue.dart';
 
 class LoginView extends StatefulWidget {
@@ -37,7 +31,6 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    //need add scaffold has body parameter
     return Scaffold(
       appBar: AppBar(
         title: const Center(child: Text('Login')),
@@ -73,7 +66,7 @@ class _LoginViewState extends State<LoginView> {
               //We need to create an exception using try for login of our user
               try {
                 // try block can be accompanied by more catch block to catch more exceptions
-                await FirebaseAuth.instance.signInWithEmailAndPassword(
+                await AuthService.firebase().logIn(
                   email: email,
                   password: password,
                 );
@@ -81,12 +74,11 @@ class _LoginViewState extends State<LoginView> {
                 // pushNamedAndRemoveUntil have screen want to put something on top
                 // pushing popular term mobile dev had screen push button puts another screen on top
                 // Dart always important suffix param with commas
-
-                //We need to check if the user is verified so they cant sign in without doing so
-                //get the current user
-                final user = FirebaseAuth.instance.currentUser;
+                // We need to check if the user is verified so they cant sign in without doing so
+                // get the current user
+                final user = AuthService.firebase().currentUser;
                 // checking if user is verified
-                if (user?.emailVerified ?? false) {
+                if (user?.isEmailVerified ?? false) {
                   //users email is verifed
                   //take us to our main route of the app
                   Navigator.of(context).pushNamedAndRemoveUntil(
@@ -100,36 +92,23 @@ class _LoginViewState extends State<LoginView> {
                     (route) => false,
                   );
                 }
-
                 //catching fire base auth exceptions and generic giving  3 cases and we need alert for each case
-
-              } on FirebaseAuthException catch (e) {
-                // format catching specific exception with on and classname exception in handling
-                // print(e.code); errors code
-                // if statement on e.code if user not found print that user not found
-                if (e.code == 'user-not-found') {
-                  // going display alert using new function
-                  await showErrorDialog(
-                    context,
-                    'User Not Found',
-                  );
-                } else if (e.code == 'wrong-password') {
-                  // another exception if user login and the password is wrong
-                  // alert our user
-                  await showErrorDialog(
-                    context,
-                    'Looks like the password you typed was incorrect please try again',
-                  );
-                } else {
-                  //generic firebase auth error
-                  await showErrorDialog(
-                    context,
-                    'Error ${e.code}',
-                  );
-                }
-                //generic catch block any other error that our code finds out about
-              } catch (e) {
-                await showErrorDialog(context, 'Error : ${e.toString()}');
+              } on UserNotFoundAuthException {
+                // going display alert using new function
+                await showErrorDialog(
+                  context,
+                  'User Not Found',
+                );
+              } on WrongPasswordAuthException {
+                await showErrorDialog(
+                  context,
+                  'Looks like the password you typed was incorrect please try again',
+                );
+              } on GenericAuthException {
+                await showErrorDialog(
+                  context,
+                  'Authentication error',
+                );
               }
             },
             child: const Text('Login'),

@@ -18,8 +18,9 @@
 // stf is shortcut for creating a stateful widget within flutter
 // stl is shortcut for stateless widget in flutter
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hand_in_need/services/auth/auth_exceptions.dart';
+import 'package:hand_in_need/services/auth/auth_service.dart';
 import 'dart:developer' as console show log;
 import '../constants/routes.dart';
 import '../utilities/show_error_dialogue.dart';
@@ -98,46 +99,35 @@ class _RegisterViewState extends State<RegisterView> {
               // Also the weak password exception
               // Another exception to catch is invalid email as well
               try {
-                await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                    email: email, password: password);
+                await AuthService.firebase().createUser(
+                  email: email,
+                  password: password,
+                );
                 //once user able to register we want to show verify email route so that the user can verify email \
                 // using pushnamed and not remove
                 //Instead making user press button what if we configured for it to do so
-                final user = FirebaseAuth.instance.currentUser;
-                await user?.sendEmailVerification();
-                // take you to email verify view
+                await AuthService.firebase().sendEmailVerification();
                 Navigator.of(context).pushNamed(verifyEmailRoute);
-
-                // three auth and generic makign 4 expections
-              } on FirebaseAuthException catch (e) {
-                // print(e.code);
-                if (e.code == 'weak-password') {
-                  console.log('weak password');
-                  // alert our user about weak password from our function in login view
-                  await showErrorDialog(
-                    context,
-                    'Your password appears to be weak please enter a more secure password!',
-                  );
-                } else if (e.code == 'email-already-in-use') {
-                  await showErrorDialog(
-                    context,
-                    'It appears this email is already in use try another email or login',
-                  );
-                } else if (e.code == 'invalid-email') {
-                  await showErrorDialog(
-                    context,
-                    'Email given is invalid please try another email',
-                  );
-                } else {
-                  //specify generic case for firebase auth
-                  await showErrorDialog(
-                    context,
-                    'Error ${e.code}',
-                  );
-                }
-                // generic case in general for error in code
-              } catch (e) {
-                await showErrorDialog(context, 'Error : ${e.toString()}');
+              } on WeakPasswordAuthException {
+                await showErrorDialog(
+                  context,
+                  'Your password appears to be weak please enter a more secure password!',
+                );
+              } on EmailAlreadyInUseAuthException {
+                await showErrorDialog(
+                  context,
+                  'It appears this email is already in use try another email or login',
+                );
+              } on InvalidEmailAuthException {
+                await showErrorDialog(
+                  context,
+                  'Email given is invalid please try another email',
+                );
+              } on GenericAuthException {
+                await showErrorDialog(
+                  context,
+                  'Failed to register',
+                );
               }
             },
             child: const Text('Sign up'),

@@ -5,14 +5,24 @@
 import 'package:hand_in_need/services/auth/auth_exceptions.dart'; // abstract auth errors and generic errors
 import 'package:hand_in_need/services/auth/auth_provider.dart'; //  class auth user implementation
 import 'package:hand_in_need/services/auth/auth_user.dart'; // login create user function need return auth user
-
-// also need to import firebase as well
+// also need to import firebase as well also other libraries files associated
 import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuth, FirebaseAuthException;
+import '../../firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 // fire base auth class implements auth provider
 
 class FirebaseAuthProvider implements AuthProvider {
+  // initializing firebase
+  @override
+  Future<void> initialize() async {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
+
+  // create user
   @override
   Future<AuthUser> createUser({
     required String email,
@@ -56,12 +66,12 @@ class FirebaseAuthProvider implements AuthProvider {
     }
   }
 
+  // fire base login
   @override
   Future<AuthUser> logIn({
     required String email,
     required String password,
   }) async {
-    // TODO: implement logIn
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
@@ -86,6 +96,7 @@ class FirebaseAuthProvider implements AuthProvider {
     }
   } // async function
 
+  // log out
   @override
   Future<void> logOut() async {
     // check if user exists before logging out

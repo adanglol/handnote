@@ -5,6 +5,8 @@ import 'package:hand_in_need/services/auth/auth_user.dart';
 
 // create a abstract class for auth provider fb google etc return current user also conforms to our class and what we specify
 abstract class AuthProvider {
+  // we need function to initilize FireBase
+  Future<void> initialize();
   // return us current auth user
   AuthUser?
       get currentUser; // any auth provider need be able to option return current auth user

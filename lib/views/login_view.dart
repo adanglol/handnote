@@ -81,10 +81,25 @@ class _LoginViewState extends State<LoginView> {
                 // pushNamedAndRemoveUntil have screen want to put something on top
                 // pushing popular term mobile dev had screen push button puts another screen on top
                 // Dart always important suffix param with commas
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  notesRoute,
-                  (route) => false,
-                );
+
+                //We need to check if the user is verified so they cant sign in without doing so
+                //get the current user
+                final user = FirebaseAuth.instance.currentUser;
+                // checking if user is verified
+                if (user?.emailVerified ?? false) {
+                  //users email is verifed
+                  //take us to our main route of the app
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    notesRoute,
+                    (route) => false,
+                  );
+                } else {
+                  //users email is not verified
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    verifyEmailRoute,
+                    (route) => false,
+                  );
+                }
 
                 //catching fire base auth exceptions and generic giving  3 cases and we need alert for each case
 

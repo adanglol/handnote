@@ -17,7 +17,7 @@ import 'firebase_options.dart';
 // 8:12 Stateless vs Stateful
 // Hot reload keeps state
 // State is just data that is mutated by application or both like pressing button
-//Widgets
+// Widgets
 // Stateful Widget widget contains information that can be changed as user interacts or as time goes by or widget seems fit
 // Stateless widget can not contain mutable pieces of information and does not manage any internally
 

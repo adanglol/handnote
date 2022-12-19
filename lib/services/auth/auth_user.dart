@@ -8,10 +8,11 @@ import 'dart:developer' as console show log;
 class AuthUser {
   // have a bool value to check whether our User is verified or not
   final bool isEmailVerified;
-  const AuthUser(this.isEmailVerified);
-
+  const AuthUser(
+      {required this.isEmailVerified}); // add {} and required for require param
   // create a factory constructor that creates AuthUser from Firebase User
   // useful want object X want create object Y from that
   // Given our user from firebase create an instance with our Auth User class
-  factory AuthUser.fromFireBase(User user) => AuthUser(user.emailVerified);
+  factory AuthUser.fromFireBase(User user) =>
+      AuthUser(isEmailVerified: user.emailVerified);
 }

@@ -30,6 +30,10 @@ import 'constants/routes.dart';
 // git commit -am "step2"
 // git push
 
+// git tag ""
+// git status
+// git push --tags
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MaterialApp(

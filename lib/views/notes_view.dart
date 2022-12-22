@@ -1,6 +1,8 @@
 // Create a new statful widget called notesView main UI for people login of our app
 import 'package:flutter/material.dart';
 import 'package:hand_in_need/services/auth/auth_service.dart';
+import 'package:hand_in_need/services/auth/auth_user.dart';
+import 'package:hand_in_need/services/crud/notes_service.dart';
 import '../constants/routes.dart';
 import '../enums/menu_actions.dart';
 import 'dart:developer' as console show log;
@@ -13,6 +15,29 @@ class NotesView extends StatefulWidget {
 }
 
 class _NotesViewState extends State<NotesView> {
+  // grabbing instance of notes service so we can work with it
+  late final NotesService _notesService;
+  // read current user's email in notes view
+  String get userEmail => AuthService.firebase().currentUser!.email!;
+
+  // what happen when class is made will do once each time called init like python
+  @override
+  void initState() {
+    // instance
+    _notesService = NotesService();
+    // open database
+    _notesService.open();
+    super.initState();
+  }
+
+  // get rid of functon what will happen
+  @override
+  void dispose() {
+    // close database
+    _notesService.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,7 +77,30 @@ class _NotesViewState extends State<NotesView> {
           )
         ],
       ),
-      body: const Text('Hello World'),
+      // in body we need create a user or get current user from database if already exist
+      // use getter in notes view put in email param for future
+      body: FutureBuilder(
+        // get or create our user
+        future: _notesService.getOrCreateUser(email: userEmail),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.done:
+              return StreamBuilder(
+                stream: _notesService.allNotes,
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      return const Text('Waiting for all notes to render...');
+                    default:
+                      return const CircularProgressIndicator();
+                  }
+                },
+              );
+            default:
+              return const CircularProgressIndicator();
+          }
+        },
+      ),
     );
   }
 }

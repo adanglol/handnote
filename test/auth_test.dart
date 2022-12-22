@@ -75,7 +75,7 @@ void main() {
       // test if user login isverified = false
       expect(user.isEmailVerified, false);
     });
-    // test email verification functonality
+    //test email verification functonality
     test('Logged in user should be able to get verified', () {
       provider.sendEmailVerification();
       final user = provider.currentUser;
@@ -137,7 +137,8 @@ class MockAuthProvider implements AuthProvider {
     // add fake functionaility to run tests on them
     if (email == 'foo@bar.com') throw UserNotFoundAuthException();
     if (password == 'foobar') throw WrongPasswordAuthException();
-    const user = AuthUser(isEmailVerified: false);
+    // email param
+    const user = AuthUser(isEmailVerified: false, email: 'foo@bar.com');
     _user = user;
     return Future.value(user);
   }
@@ -159,6 +160,8 @@ class MockAuthProvider implements AuthProvider {
     // create new user assign it to current user
     const newUser = AuthUser(
       isEmailVerified: true,
+      // param
+      email: 'foo@bar.com',
     );
     _user = newUser;
   }

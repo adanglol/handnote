@@ -1,7 +1,7 @@
 // this is where all of our database exceptions or crud exceptins will be
 
 // make an exception if our database already opened
-class DatabaseAlreadyOpenExceptionn implements Exception {}
+class DatabaseAlreadyOpenException implements Exception {}
 
 // unable to get doc directory exception
 class UnableToGetDocumentDirectory implements Exception {}

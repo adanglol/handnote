@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:hand_in_need/services/auth/auth_service.dart';
 import 'package:hand_in_need/services/auth/auth_user.dart';
 import 'package:hand_in_need/services/crud/notes_service.dart';
-import '../constants/routes.dart';
-import '../enums/menu_actions.dart';
+import '../../constants/routes.dart';
+import '../../enums/menu_actions.dart';
 import 'dart:developer' as console show log;
 
 class NotesView extends StatefulWidget {
@@ -42,9 +42,17 @@ class _NotesViewState extends State<NotesView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Main UI'),
+        title: const Text('Your Notes'),
         // Where our menu button and popup items will be under action param
         actions: [
+          // Icon button to add new notes and take us to new notes view
+          IconButton(
+            onPressed: () {
+              // takes us to new notes view
+              Navigator.of(context).pushNamed(newNoteRoute);
+            },
+            icon: const Icon(Icons.add),
+          ),
           // PopUp menu button where our enum above is integrated and managed by button
           PopupMenuButton<MenuAction>(
             onSelected: (value) async {

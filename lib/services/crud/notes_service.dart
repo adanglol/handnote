@@ -4,6 +4,8 @@ import 'dart:async';
 // import 'dart:html';
 import 'dart:io';
 
+// 20:39
+// HERE IS WHERE WE LEFt OFF  we have no data
 import 'package:flutter/foundation.dart';
 import 'package:hand_in_need/services/crud/crud_exceptions.dart';
 import 'package:sqflite/sqflite.dart';
@@ -14,13 +16,11 @@ class NotesService {
   Database? _db;
   // cache our note data before immidetly interacting with database
   List<DatabaseNote> _notes = [];
-
-  // we need to make this class a singleton so we dont have to make an instance over and over and over 
+  // we need to make this class a singleton so we dont have to make an instance over and over and over
+  // in case of using this for notes view we should not have multiple instances just one that is continuously used
   static final NotesService _shared = NotesService._sharedInstance();
-  NotesService._sharedInstance()
-  // factory constructor to help share functionality of singelton
+  NotesService._sharedInstance();
   factory NotesService() => _shared;
-  
   // add Stream controller so that our UI can reactively interact with data and work with code
   // have pipeline to manipulate data continuosly
   // broadcast saying ok to create to new listeners to new changes to stream controller

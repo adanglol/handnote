@@ -83,7 +83,7 @@ void main() {
       // check if user verification set isEmailverified true
       expect(user!.isEmailVerified, true);
     });
-    // Test loggin out and loggin in again it should just work
+    // Test loggin out and   loggin in again it should just work
     test('Should be able to log out log in again', () async {
       await provider.logOut();
       await provider.logIn(
@@ -138,7 +138,10 @@ class MockAuthProvider implements AuthProvider {
     if (email == 'foo@bar.com') throw UserNotFoundAuthException();
     if (password == 'foobar') throw WrongPasswordAuthException();
     // email param
-    const user = AuthUser(isEmailVerified: false, email: 'foo@bar.com');
+    const user = AuthUser(
+      isEmailVerified: false,
+      email: 'foo@bar.com',
+    );
     _user = user;
     return Future.value(user);
   }

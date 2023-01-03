@@ -19,13 +19,19 @@ class NotesService {
   // we need to make this class a singleton so we dont have to make an instance over and over and over
   // in case of using this for notes view we should not have multiple instances just one that is continuously used
   static final NotesService _shared = NotesService._sharedInstance();
-  NotesService._sharedInstance();
+  NotesService._sharedInstance() {
+    _notesStreamController = StreamController<List<DatabaseNote>>.broadcast(
+      // called when new listen subscribe to note stream controllers stream
+      onListen: () {
+        _notesStreamController.sink.add(_notes);
+      },
+    );
+  }
   factory NotesService() => _shared;
   // add Stream controller so that our UI can reactively interact with data and work with code
   // have pipeline to manipulate data continuosly
   // broadcast saying ok to create to new listeners to new changes to stream controller
-  final _notesStreamController =
-      StreamController<List<DatabaseNote>>.broadcast();
+  late final StreamController<List<DatabaseNote>> _notesStreamController;
 
   // function that allows to retrieve all notes in note service
   Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;

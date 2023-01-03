@@ -30,14 +30,6 @@ class _NotesViewState extends State<NotesView> {
     super.initState();
   }
 
-  // get rid of functon what will happen
-  @override
-  void dispose() {
-    // close database
-    _notesService.close();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,7 +92,30 @@ class _NotesViewState extends State<NotesView> {
                     // implicit fall through
                     case ConnectionState.waiting:
                     case ConnectionState.active:
-                      return const Text('Waiting for all notes to render...');
+                      // ListView widget list of notes
+                      // how many items to render
+                      // snapshot is our notes we are going to check
+                      if (snapshot.hasData) {
+                        // grab data
+                        final allNotes = snapshot.data as List<DatabaseNote>;
+                        return ListView.builder(
+                          itemCount: allNotes.length,
+                          itemBuilder: (context, index) {
+                            // current note
+                            final note = allNotes[index];
+                            return ListTile(
+                              title: Text(
+                                note.text,
+                                maxLines: 1,
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            );
+                          },
+                        );
+                      } else {
+                        return const CircularProgressIndicator();
+                      }
                     default:
                       return const CircularProgressIndicator();
                   }

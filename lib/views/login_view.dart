@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hand_in_need/constants/routes.dart';
 import 'package:hand_in_need/services/auth/auth_exceptions.dart';
 import 'package:hand_in_need/services/auth/auth_service.dart';
-import '../utilities/show_error_dialogue.dart';
+import 'package:hand_in_need/utilities/dialogs/error_dialouge.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -95,17 +95,17 @@ class _LoginViewState extends State<LoginView> {
                 //catching fire base auth exceptions and generic giving  3 cases and we need alert for each case
               } on UserNotFoundAuthException {
                 // going display alert using new function
-                await showErrorDialog(
+                await showErrorDialouge(
                   context,
                   'User Not Found',
                 );
               } on WrongPasswordAuthException {
-                await showErrorDialog(
+                await showErrorDialouge(
                   context,
                   'Looks like the password you typed was incorrect please try again',
                 );
               } on GenericAuthException {
-                await showErrorDialog(
+                await showErrorDialouge(
                   context,
                   'Authentication error',
                 );

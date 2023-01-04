@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:hand_in_need/services/auth/auth_service.dart';
 import 'package:hand_in_need/services/auth/auth_user.dart';
 import 'package:hand_in_need/services/crud/notes_service.dart';
+import 'package:hand_in_need/utilities/dialogs/logout_dialouge.dart';
+import 'package:hand_in_need/views/notes/notes_list_view.dart';
 import '../../constants/routes.dart';
 import '../../enums/menu_actions.dart';
 import 'dart:developer' as console show log;
@@ -23,7 +25,7 @@ class _NotesViewState extends State<NotesView> {
   // what happen when class is made will do once each time called init like python
   @override
   void initState() {
-    // instance
+    // instancea
     _notesService = NotesService();
     // open database
     _notesService.open();
@@ -55,7 +57,7 @@ class _NotesViewState extends State<NotesView> {
               switch (value) {
                 case MenuAction.logout:
                   // display our alert
-                  final shouldLogOut = await showLogOutDialog(context);
+                  final shouldLogOut = await logoutDialouge(context);
                   console.log(shouldLogOut.toString());
                   // we need to make user logout first we need set up a condition for it
                   if (shouldLogOut) {
@@ -92,25 +94,14 @@ class _NotesViewState extends State<NotesView> {
                     // implicit fall through
                     case ConnectionState.waiting:
                     case ConnectionState.active:
-                      // ListView widget list of notes
-                      // how many items to render
-                      // snapshot is our notes we are going to check
                       if (snapshot.hasData) {
                         // grab data
                         final allNotes = snapshot.data as List<DatabaseNote>;
-                        return ListView.builder(
-                          itemCount: allNotes.length,
-                          itemBuilder: (context, index) {
-                            // current note
-                            final note = allNotes[index];
-                            return ListTile(
-                              title: Text(
-                                note.text,
-                                maxLines: 1,
-                                softWrap: true,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            );
+                        // list view
+                        return NotesListView(
+                          notes: allNotes,
+                          onDeleteNote: (note) async {
+                            await _notesService.deleteNote(id: note.id);
                           },
                         );
                       } else {
@@ -128,35 +119,4 @@ class _NotesViewState extends State<NotesView> {
       ),
     );
   }
-}
-
-// Create a future function for logout that returns either true or false
-// show dialog - future funciton returns optional value
-// alert dialog - stateless widget defines dialouge display to user itself
-Future<bool> showLogOutDialog(BuildContext context) {
-  return showDialog<bool>(
-    context: context,
-    // help create an alert dialog for user
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
-        // buttons within our dialouge so two text buttons a yes or no
-        actions: [
-          TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-              child: const Text('Cancel')),
-          TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-              child: const Text('Log out')),
-        ],
-      );
-    },
-    // if the optional boolean not returned so if user leaves without pressing button we use then to set as false
-    // if value present or not using then function
-  ).then((value) => value ?? false);
 }

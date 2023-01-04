@@ -5,6 +5,7 @@ import 'package:hand_in_need/services/crud/notes_service.dart';
 import 'package:sqflite/sqflite.dart';
 
 // left off at 21 hour mark creating new notes
+//left off at abotu 22 hour on delete notes
 
 class NewNoteView extends StatefulWidget {
   const NewNoteView({super.key});

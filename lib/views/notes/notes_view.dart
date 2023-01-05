@@ -1,7 +1,6 @@
 // Create a new statful widget called notesView main UI for people login of our app
 import 'package:flutter/material.dart';
 import 'package:hand_in_need/services/auth/auth_service.dart';
-import 'package:hand_in_need/services/auth/auth_user.dart';
 import 'package:hand_in_need/services/crud/notes_service.dart';
 import 'package:hand_in_need/utilities/dialogs/logout_dialouge.dart';
 import 'package:hand_in_need/views/notes/notes_list_view.dart';
@@ -43,7 +42,9 @@ class _NotesViewState extends State<NotesView> {
           IconButton(
             onPressed: () {
               // takes us to new notes view
-              Navigator.of(context).pushNamed(newNoteRoute);
+              Navigator.of(context).pushNamed(
+                createOrUpdateNoteRoute,
+              );
             },
             icon: const Icon(Icons.add),
           ),
@@ -102,6 +103,12 @@ class _NotesViewState extends State<NotesView> {
                           notes: allNotes,
                           onDeleteNote: (note) async {
                             await _notesService.deleteNote(id: note.id);
+                          },
+                          onTap: (note) {
+                            Navigator.of(context).pushNamed(
+                              createOrUpdateNoteRoute,
+                              arguments: note,
+                            );
                           },
                         );
                       } else {

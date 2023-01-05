@@ -2,19 +2,20 @@
 import 'package:flutter/material.dart';
 import 'package:hand_in_need/services/auth/auth_service.dart';
 import 'package:hand_in_need/services/crud/notes_service.dart';
+import 'package:hand_in_need/utilities/generics/get_arguements.dart';
 import 'package:sqflite/sqflite.dart';
 
 // left off at 21 hour mark creating new notes
 //left off at abotu 22 hour on delete notes
 
-class NewNoteView extends StatefulWidget {
-  const NewNoteView({super.key});
+class CreateUpdateNoteView extends StatefulWidget {
+  const CreateUpdateNoteView({super.key});
 
   @override
-  State<NewNoteView> createState() => _NewNoteViewState();
+  State<CreateUpdateNoteView> createState() => _CreateUpdateNoteViewState();
 }
 
-class _NewNoteViewState extends State<NewNoteView> {
+class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   // keep hold current note so it does not repeat creating note over and over again
   DatabaseNote? _note;
   // keep reference to note service
@@ -51,7 +52,18 @@ class _NewNoteViewState extends State<NewNoteView> {
   }
 
   // create new note
-  Future<DatabaseNote> createNewNote() async {
+  Future<DatabaseNote> createOrGetExistingNote(BuildContext context) async {
+    // checking our database note for arguments
+    final widgetNote = context.getArguement<DatabaseNote>();
+    // eiter have note or dont or tapped on plus
+    // existing note
+    if (widgetNote != null) {
+      // save in note variable
+      _note = widgetNote;
+      // make sure text field on screen should be prepopulated with notes text
+      _textController.text = widgetNote.text;
+      return widgetNote;
+    }
     // check if we have created note before inside _note var
     final exitingNote = _note;
     if (exitingNote != null) {
@@ -61,7 +73,11 @@ class _NewNoteViewState extends State<NewNoteView> {
         .currentUser!; // should expect have current user ! not case will crash
     final email = currentUser.email!; // also wrap email as well
     final owner = await _notesService.getUser(email: email);
-    return await _notesService.createNote(owner: owner);
+    final newNote = await _notesService.createNote(owner: owner);
+    // saving our note
+    _note = newNote;
+    // return latest version of note
+    return newNote;
   }
 
   // function that when disposed on new note if no text delete it we dont want invisible cells for user
@@ -103,14 +119,12 @@ class _NewNoteViewState extends State<NewNoteView> {
       appBar: AppBar(title: const Text('New Note')),
       // utilizing functionality in UI usign future builder
       body: FutureBuilder(
-        // create new note
-        future: createNewNote(),
+        // create new note or get if it exists
+        future: createOrGetExistingNote(context),
         // what kind build we want return widget
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
-              // get _note from snapshot
-              _note = snapshot.data as DatabaseNote;
               // where want listen text changes in main UI
               _setupTextControllerListener();
               return TextField(

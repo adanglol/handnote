@@ -24,5 +24,8 @@ class CouldNotDeleteNote implements Exception {}
 // if we can not find note in app
 class CouldNotFindNote implements Exception {}
 
-//if we cannot update our note in app
+// if we cannot update our note in app
 class CouldNotUpdateNote implements Exception {}
+
+// if user is not set before reading the notes in our stream
+class UserShouldBeSetBeforeReadingAllNotes implements Exception {}

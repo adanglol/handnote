@@ -7,6 +7,7 @@ import 'dart:io';
 // 20:39
 // HERE IS WHERE WE LEFt OFF  we have no data
 import 'package:flutter/foundation.dart';
+import 'package:hand_in_need/lists/filter.dart';
 import 'package:hand_in_need/services/crud/crud_exceptions.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
@@ -16,6 +17,13 @@ class NotesService {
   Database? _db;
   // cache our note data before immidetly interacting with database
   List<DatabaseNote> _notes = [];
+
+  // define a current user so only notes releveant to user are shown
+  DatabaseUser? _user;
+  // want make sure user is set before grab list of notes
+  // notes service if want read all notes need make sure to set current user
+  // if not we need to set an exception to catch that
+
   // we need to make this class a singleton so we dont have to make an instance over and over and over
   // in case of using this for notes view we should not have multiple instances just one that is continuously used
   static final NotesService _shared = NotesService._sharedInstance();
@@ -34,7 +42,15 @@ class NotesService {
   late final StreamController<List<DatabaseNote>> _notesStreamController;
 
   // function that allows to retrieve all notes in note service
-  Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;
+  Stream<List<DatabaseNote>> get allNotes =>
+      _notesStreamController.stream.filter((note) {
+        final currentUser = _user;
+        if (currentUser != null) {
+          return note.userId == currentUser.id;
+        } else {
+          throw UserShouldBeSetBeforeReadingAllNotes();
+        }
+      });
 
   // function that allows us to read all available notes in our database and cache in our notes and controller
   // private prefix _
@@ -48,15 +64,28 @@ class NotesService {
   }
 
   // function allows us to get or create user that is tied to our firebase user in our app
-  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+  // parameter that also sets as current user
+  //
+  Future<DatabaseUser> getOrCreateUser({
+    required String email,
+    bool setAsCurrentUser = true,
+  }) async {
     // try get user from database if it does not exist than we create one
     try {
       // this case we could get user
       final user = await getUser(email: email);
+      // if we could retrieve user and bool is true set own user to this user
+      if (setAsCurrentUser) {
+        _user = user;
+      }
       return user;
     } on CouldNotFindUser {
       // we need create user
       final createdUser = await createUser(email: email);
+      // if we had create user and param true then we have to set current user to created user
+      if (setAsCurrentUser) {
+        _user = createdUser;
+      }
       return createdUser;
       // cheap way of making code easy debug
     } catch (e) {
@@ -164,6 +193,7 @@ class NotesService {
   }
 
   // function that allows the user to update existing notes
+  // 23:16 bug with updating
   Future<DatabaseNote> updateNote({
     required DatabaseNote note,
     required String text,
@@ -172,11 +202,18 @@ class NotesService {
     final db = _getDatabaseOrThrow();
     // make sure note exists
     await getNote(id: note.id);
+
     // update our notes in database
-    final updatesCount = await db.update(noteTable, {
-      textColumn: text,
-      isSyncedWithCloudColumn: 0,
-    });
+    // we are not specifying which row we are updating so it is doing all of them need add where arguement
+    final updatesCount = await db.update(
+      noteTable,
+      {
+        textColumn: text,
+        isSyncedWithCloudColumn: 0,
+      },
+      where: 'id = ?',
+      whereArgs: [note.id],
+    );
     // calling update note  assume note should have exist in database update count should be other value beside 0
     if (updatesCount == 0) {
       // throw could not update note exception

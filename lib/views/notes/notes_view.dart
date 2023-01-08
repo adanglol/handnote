@@ -19,7 +19,7 @@ class _NotesViewState extends State<NotesView> {
   // grabbing instance of notes service so we can work with it
   late final NotesService _notesService;
   // read current user's email in notes view
-  String get userEmail => AuthService.firebase().currentUser!.email!;
+  String get userEmail => AuthService.firebase().currentUser!.email;
 
   // what happen when class is made will do once each time called init like python
   @override

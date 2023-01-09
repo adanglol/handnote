@@ -1,9 +1,16 @@
 // when create notes in our UI this will be what shows brand new one
 import 'package:flutter/material.dart';
 import 'package:hand_in_need/services/auth/auth_service.dart';
-import 'package:hand_in_need/services/crud/notes_service.dart';
 import 'package:hand_in_need/utilities/generics/get_arguements.dart';
-import 'package:sqflite/sqflite.dart';
+
+// import our cloud database to our create notes UI
+import 'package:hand_in_need/services/cloud/cloud_note.dart';
+import 'package:hand_in_need/services/cloud/firebase_cloud_storage.dart';
+import 'package:hand_in_need/services/cloud/cloud_storage_exceptions.dart';
+
+// import from local database we are moving to the cloud \
+// import 'package:sqflite/sqflite.dart';
+// import 'package:hand_in_need/services/crud/notes_service.dart';
 
 // left off at 21 hour mark creating new notes
 //left off at abotu 22 hour on delete notes
@@ -17,17 +24,17 @@ class CreateUpdateNoteView extends StatefulWidget {
 
 class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   // keep hold current note so it does not repeat creating note over and over again
-  DatabaseNote? _note;
-  // keep reference to note service
-  late final NotesService _notesService;
+  CloudNote? _note;
+  // keep reference to note service changed to firebase service because we going to cloud
+  late final FirebaseCloudStorage _notesService;
   // need text editing controller for user to type in new notes
   late final TextEditingController _textController;
 
   // when new note view starts
   @override
   void initState() {
-    // make sure we create an instead of noteservice and text controller
-    _notesService = NotesService();
+    // make sure we create an instance of noteservice and text controller
+    _notesService = FirebaseCloudStorage();
     _textController = TextEditingController();
     super.initState();
   }
@@ -40,7 +47,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     }
     final text = _textController.text;
     await _notesService.updateNote(
-      note: note,
+      documentId: note.documentId,
       text: text,
     );
   }
@@ -52,9 +59,9 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   }
 
   // create new note
-  Future<DatabaseNote> createOrGetExistingNote(BuildContext context) async {
+  Future<CloudNote> createOrGetExistingNote(BuildContext context) async {
     // checking our database note for arguments
-    final widgetNote = context.getArguement<DatabaseNote>();
+    final widgetNote = context.getArguement<CloudNote>();
     // eiter have note or dont or tapped on plus
     // existing note
     if (widgetNote != null) {
@@ -71,9 +78,8 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     }
     final currentUser = AuthService.firebase()
         .currentUser!; // should expect have current user ! not case will crash
-    final email = currentUser.email; // also wrap email as well
-    final owner = await _notesService.getUser(email: email);
-    final newNote = await _notesService.createNote(owner: owner);
+    final userId = currentUser.id;
+    final newNote = await _notesService.createNewNote(ownerUserId: userId);
     // saving our note
     _note = newNote;
     // return latest version of note
@@ -86,7 +92,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     // text input field is empty and note is not null so if it was created
     if (_textController.text.isEmpty && note != null) {
       // delete it
-      _notesService.deleteNote(id: note.id);
+      _notesService.deleteNote(documentId: note.documentId);
     }
   }
 
@@ -98,7 +104,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     // if there is text and have note then update in database
     if (text.isNotEmpty && note != null) {
       await _notesService.updateNote(
-        note: note,
+        documentId: note.documentId,
         text: text,
       );
     }

@@ -11,11 +11,19 @@ class FirebaseCloudStorage {
   final notes = FirebaseFirestore.instance.collection('notes');
 
   // function allow create new notes
-  void createNewNote({required String ownerUserId}) async {
-    await notes.add({
+  // we need this function not be void and actually return our new note
+  Future<CloudNote> createNewNote({required String ownerUserId}) async {
+    final document = await notes.add({
       ownerUserIdFieldName: ownerUserId,
       textFieldName: '',
     });
+    // this is our snapshot that will contain data of our doc
+    final fetchedNote = await document.get();
+    return CloudNote(
+      documentId: fetchedNote.id,
+      ownerUserId: ownerUserId,
+      text: '',
+    );
   }
 
   // function allows us to update notes
@@ -65,13 +73,12 @@ class FirebaseCloudStorage {
           )
           .get()
           // returns value of that future and allow return synchronoous val or another future
-          .then((value) => value.docs.map((doc) {
-                // create instance of cloudnote and return it
-                return CloudNote(
-                    documentId: doc.id,
-                    ownerUserId: doc.data()[ownerUserIdFieldName] as String,
-                    text: doc.data()[textFieldName] as String);
-              }));
+          .then(
+            (value) => value.docs.map(
+              // grab doc from cloudnote snapshot
+              (doc) => CloudNote.fromSnapshot(doc),
+            ),
+          );
     } catch (e) {
       throw CouldNotGetAllNotesException();
     }

@@ -1,7 +1,10 @@
 // Create a new statful widget called notesView main UI for people login of our app
 import 'package:flutter/material.dart';
 import 'package:hand_in_need/services/auth/auth_service.dart';
-import 'package:hand_in_need/services/crud/notes_service.dart';
+import 'package:hand_in_need/services/cloud/cloud_note.dart';
+import 'package:hand_in_need/services/cloud/firebase_cloud_storage.dart';
+// comment out crud transition to cloud
+// import 'package:hand_in_need/services/crud/notes_service.dart';
 import 'package:hand_in_need/utilities/dialogs/logout_dialouge.dart';
 import 'package:hand_in_need/views/notes/notes_list_view.dart';
 import '../../constants/routes.dart';
@@ -17,17 +20,15 @@ class NotesView extends StatefulWidget {
 
 class _NotesViewState extends State<NotesView> {
   // grabbing instance of notes service so we can work with it
-  late final NotesService _notesService;
-  // read current user's email in notes view
-  String get userEmail => AuthService.firebase().currentUser!.email;
+  late final FirebaseCloudStorage _notesService;
+  // read current user ID
+  String get userId => AuthService.firebase().currentUser!.id;
 
   // what happen when class is made will do once each time called init like python
   @override
   void initState() {
-    // instancea
-    _notesService = NotesService();
-    // open database
-    _notesService.open();
+    // instance
+    _notesService = FirebaseCloudStorage();
     super.initState();
   }
 
@@ -82,43 +83,34 @@ class _NotesViewState extends State<NotesView> {
       ),
       // in body we need create a user or get current user from database if already exist
       // use getter in notes view put in email param for future
-      body: FutureBuilder(
-        // get or create our user
-        future: _notesService.getOrCreateUser(email: userEmail),
+      // UPDATE!!!
+      // since we don't  need to create or get user from local data base we are going to cloud then we dont need future builder anymore
+      body: StreamBuilder(
+        stream: _notesService.allNotes(ownerUserId: userId),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
-            case ConnectionState.done:
-              return StreamBuilder(
-                stream: _notesService.allNotes,
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    // implicit fall through
-                    case ConnectionState.waiting:
-                    case ConnectionState.active:
-                      if (snapshot.hasData) {
-                        // grab data
-                        final allNotes = snapshot.data as List<DatabaseNote>;
-                        // list view
-                        return NotesListView(
-                          notes: allNotes,
-                          onDeleteNote: (note) async {
-                            await _notesService.deleteNote(id: note.id);
-                          },
-                          onTap: (note) {
-                            Navigator.of(context).pushNamed(
-                              createOrUpdateNoteRoute,
-                              arguments: note,
-                            );
-                          },
-                        );
-                      } else {
-                        return const CircularProgressIndicator();
-                      }
-                    default:
-                      return const CircularProgressIndicator();
-                  }
-                },
-              );
+            // implicit fall through
+            case ConnectionState.waiting:
+            case ConnectionState.active:
+              if (snapshot.hasData) {
+                // grab data
+                final allNotes = snapshot.data as Iterable<CloudNote>;
+                // list view
+                return NotesListView(
+                  notes: allNotes,
+                  onDeleteNote: (note) async {
+                    await _notesService.deleteNote(documentId: note.documentId);
+                  },
+                  onTap: (note) {
+                    Navigator.of(context).pushNamed(
+                      createOrUpdateNoteRoute,
+                      arguments: note,
+                    );
+                  },
+                );
+              } else {
+                return const CircularProgressIndicator();
+              }
             default:
               return const CircularProgressIndicator();
           }

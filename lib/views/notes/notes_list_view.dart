@@ -2,15 +2,17 @@
 // dont want to use notes service in list view be better to delegate it to our notes view
 // better when working with code
 import 'package:flutter/material.dart';
-import 'package:hand_in_need/services/crud/notes_service.dart';
+import 'package:hand_in_need/services/cloud/cloud_note.dart';
+// comment away our crud moving to cloud
+// import 'package:hand_in_need/services/crud/notes_service.dart';
 import 'package:hand_in_need/utilities/dialogs/delete_dialouge.dart';
 
 // define a function that we are going to use in note list view as callback when user deletes note or updates it
-typedef NoteCallback = void Function(DatabaseNote note);
+typedef NoteCallback = void Function(CloudNote note);
 
 class NotesListView extends StatelessWidget {
   // list of notes to display required param
-  final List<DatabaseNote> notes;
+  final Iterable<CloudNote> notes;
   // Our delete note callback
   final NoteCallback onDeleteNote;
   // Our tapping tile list callback
@@ -28,8 +30,9 @@ class NotesListView extends StatelessWidget {
     return ListView.builder(
       itemCount: notes.length,
       itemBuilder: (context, index) {
-        // current note
-        final note = notes[index];
+        // current note when work with list index like list[index]
+        // for iterables you do elementAt(index)
+        final note = notes.elementAt(index);
         return ListTile(
           // when the user click on the note displayed
           onTap: () {

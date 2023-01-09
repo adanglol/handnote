@@ -1,12 +1,14 @@
 // when create notes in our UI this will be what shows brand new one
 import 'package:flutter/material.dart';
 import 'package:hand_in_need/services/auth/auth_service.dart';
+import 'package:hand_in_need/utilities/dialogs/cannot_share_empty_note_dialogue.dart';
 import 'package:hand_in_need/utilities/generics/get_arguements.dart';
 
 // import our cloud database to our create notes UI
 import 'package:hand_in_need/services/cloud/cloud_note.dart';
 import 'package:hand_in_need/services/cloud/firebase_cloud_storage.dart';
 import 'package:hand_in_need/services/cloud/cloud_storage_exceptions.dart';
+import 'package:share_plus/share_plus.dart';
 
 // import from local database we are moving to the cloud \
 // import 'package:sqflite/sqflite.dart';
@@ -122,7 +124,25 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('New Note')),
+      appBar: AppBar(
+        title: const Text('New Note'),
+        actions: [
+          IconButton(
+              onPressed: () async {
+                // grab current text from our current note
+                final text = _textController.text;
+                // check if note is empty or text
+                if (_note == null || text.isEmpty) {
+                  // throw exception
+                  await showCannotShareEmptyNoteDialouge(context);
+                } else {
+                  // if has text and note is not empty then we can share contents
+                  Share.share(text);
+                }
+              },
+              icon: const Icon(Icons.share)),
+        ],
+      ),
       // utilizing functionality in UI usign future builder
       body: FutureBuilder(
         // create new note or get if it exists

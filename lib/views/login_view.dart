@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hand_in_need/constants/routes.dart';
 import 'package:hand_in_need/services/auth/auth_exceptions.dart';
 import 'package:hand_in_need/services/auth/auth_service.dart';
+import 'package:hand_in_need/services/auth/bloc/auth_bloc.dart';
+import 'package:hand_in_need/services/auth/bloc/auth_event.dart';
 import 'package:hand_in_need/utilities/dialogs/error_dialouge.dart';
 
+// Where on our try if we can login take us to our notes view page for our app
+// pushNamedAndRemoveUntil have screen want to put something on top
+// pushing popular term mobile dev had screen push button puts another screen on top
+// Dart always important suffix param with commas
+// We need to check if the user is verified so they cant sign in without doing so
+// get the current user
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
 
@@ -65,33 +74,9 @@ class _LoginViewState extends State<LoginView> {
               //when things go wrong - exception
               //We need to create an exception using try for login of our user
               try {
-                // try block can be accompanied by more catch block to catch more exceptions
-                await AuthService.firebase().logIn(
-                  email: email,
-                  password: password,
-                );
-                // Where on our try if we can login take us to our notes view page for our app
-                // pushNamedAndRemoveUntil have screen want to put something on top
-                // pushing popular term mobile dev had screen push button puts another screen on top
-                // Dart always important suffix param with commas
-                // We need to check if the user is verified so they cant sign in without doing so
-                // get the current user
-                final user = AuthService.firebase().currentUser;
-                // checking if user is verified
-                if (user?.isEmailVerified ?? false) {
-                  //users email is verifed
-                  //take us to our main route of the app
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    notesRoute,
-                    (route) => false,
-                  );
-                } else {
-                  //users email is not verified
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    verifyEmailRoute,
-                    (route) => false,
-                  );
-                }
+                // use context for authbloc
+                // using bloc to login and seperate our logic
+                context.read<AuthBloc>().add(AuthEventLogin(email, password));
                 //catching fire base auth exceptions and generic giving  3 cases and we need alert for each case
               } on UserNotFoundAuthException {
                 // going display alert using new function

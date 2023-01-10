@@ -1,6 +1,8 @@
 // Create a new statful widget called notesView main UI for people login of our app
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hand_in_need/services/auth/auth_service.dart';
+import 'package:hand_in_need/services/auth/bloc/auth_event.dart';
 import 'package:hand_in_need/services/cloud/cloud_note.dart';
 import 'package:hand_in_need/services/cloud/firebase_cloud_storage.dart';
 // comment out crud transition to cloud
@@ -10,6 +12,8 @@ import 'package:hand_in_need/views/notes/notes_list_view.dart';
 import '../../constants/routes.dart';
 import '../../enums/menu_actions.dart';
 import 'dart:developer' as console show log;
+
+import '../../services/auth/bloc/auth_bloc.dart';
 
 class NotesView extends StatefulWidget {
   const NotesView({super.key});
@@ -64,10 +68,7 @@ class _NotesViewState extends State<NotesView> {
                   // we need to make user logout first we need set up a condition for it
                   if (shouldLogOut) {
                     // Log out our user
-                    await AuthService.firebase().logOut();
-                    // after logging out lets take them to login view reroute them to
-                    Navigator.of(context)
-                        .pushNamedAndRemoveUntil(loginRoute, (route) => false);
+                    context.read<AuthBloc>().add(const AuthEventLogout());
                   }
               }
             },

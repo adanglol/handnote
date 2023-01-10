@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hand_in_need/constants/routes.dart';
 import 'package:hand_in_need/services/auth/auth_exceptions.dart';
-import 'package:hand_in_need/services/auth/auth_service.dart';
 import 'package:hand_in_need/services/auth/bloc/auth_bloc.dart';
 import 'package:hand_in_need/services/auth/bloc/auth_event.dart';
+import 'package:hand_in_need/services/auth/bloc/auth_state.dart';
 import 'package:hand_in_need/utilities/dialogs/error_dialouge.dart';
 
 // Where on our try if we can login take us to our notes view page for our app
@@ -66,37 +66,31 @@ class _LoginViewState extends State<LoginView> {
           ),
 
           //For our Login view instead of creating instance of user email pw we need to login
-          TextButton(
-            onPressed: () async {
-              final email = _email.text;
-              final password = _password.text;
-              //Sign in instead of create
-              //when things go wrong - exception
-              //We need to create an exception using try for login of our user
-              try {
+          // need implement bloc listener for our exceptions when trying to login
+          BlocListener<AuthBloc, AuthState>(
+            listener: (context, state) async {
+              // handle exceptions here
+              // UserNotFound , WrongPassword , and GenericAuth
+              if (state is AuthStateLoggedOut) {
+                if (state.exception is UserNotFoundAuthException ||
+                    state.exception is WrongPasswordAuthException) {
+                  await showErrorDialouge(context,
+                      'Looks like you typed in the wrong credentials or have not logged in with an account please try again');
+                } else if (state is GenericAuthException) {
+                  await showErrorDialouge(context, 'Authentication error');
+                }
+              }
+            },
+            child: TextButton(
+              onPressed: () async {
+                final email = _email.text;
+                final password = _password.text;
                 // use context for authbloc
                 // using bloc to login and seperate our logic
                 context.read<AuthBloc>().add(AuthEventLogin(email, password));
-                //catching fire base auth exceptions and generic giving  3 cases and we need alert for each case
-              } on UserNotFoundAuthException {
-                // going display alert using new function
-                await showErrorDialouge(
-                  context,
-                  'User Not Found',
-                );
-              } on WrongPasswordAuthException {
-                await showErrorDialouge(
-                  context,
-                  'Looks like the password you typed was incorrect please try again',
-                );
-              } on GenericAuthException {
-                await showErrorDialouge(
-                  context,
-                  'Authentication error',
-                );
-              }
-            },
-            child: const Text('Login'),
+              },
+              child: const Text('Login'),
+            ),
           ),
 
           // Create a new Text button that will direct us to our register view to sign up

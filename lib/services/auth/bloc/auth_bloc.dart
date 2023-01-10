@@ -23,7 +23,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final user = provider.currentUser;
         // if auth user is null after initialize then we know state should be logged out
         if (user == null) {
-          emit(const AuthStateLoggedOut());
+          emit(const AuthStateLoggedOut(null));
           // if there is user but if they are not verified we will take them to verify email state
         } else if (user.isEmailVerified == false) {
           emit(const AuthStateNeedsVerification());
@@ -37,8 +37,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     // Loggin in event
     on<AuthEventLogin>(
       (event, emit) async {
-        // need to load maybe make API calls to login
-        emit(const AuthStateLoading());
         // grab email and password for loggin in from auth event login state
         final email = event.email;
         final password = event.password;
@@ -53,8 +51,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           // any exception happen emit login failure
         } on Exception catch (e) {
           // exception in dart can be anything
-          // need add on Exception since AuthStateLoginFailure is expecting one
-          emit(AuthStateLoginFailure(e));
+          // need add on Exception since  is expecting one
+          emit(AuthStateLoggedOut(e));
         }
       },
     );
@@ -68,7 +66,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           // logging out
           await provider.logOut();
           // after logging out if goes through emit to logged out
-          emit(const AuthStateLoggedOut());
+          emit(const AuthStateLoggedOut(null));
         } on Exception catch (e) {
           emit(AuthStateLogoutFailure(e));
         }

@@ -39,20 +39,16 @@ class AuthStateLoggedIn extends AuthState {
 // IMPORTANT - example below with Login failure
 // states should carry with them all information the UI or consumer of Bloc requires in order fulfill requirements
 
-class AuthStateLoginFailure extends AuthState {
-  // upon login failure we need carry with that state the exception
-  final Exception exception;
-  const AuthStateLoginFailure(this.exception);
-}
-
 // need take care of verification state within bloc
 class AuthStateNeedsVerification extends AuthState {
   const AuthStateNeedsVerification();
 }
 
 // logged out state
+// if we
 class AuthStateLoggedOut extends AuthState {
-  const AuthStateLoggedOut();
+  final Exception? exception;
+  const AuthStateLoggedOut(this.exception);
 }
 
 // define our log out errors states

@@ -19,8 +19,12 @@
 // stl is shortcut for stateless widget in flutter
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hand_in_need/services/auth/auth_exceptions.dart';
 import 'package:hand_in_need/services/auth/auth_service.dart';
+import 'package:hand_in_need/services/auth/bloc/auth_bloc.dart';
+import 'package:hand_in_need/services/auth/bloc/auth_event.dart';
+import 'package:hand_in_need/services/auth/bloc/auth_state.dart';
 import 'package:hand_in_need/utilities/dialogs/error_dialouge.dart';
 import 'dart:developer' as console show log;
 import '../constants/routes.dart';
@@ -56,91 +60,84 @@ class _RegisterViewState extends State<RegisterView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Center(child: Text('Register')),
-      ),
-      body: (Column(
-        children: [
-          //grab these text fields when we click out button
-          //add hint to text field hint user what to input
-          TextField(
-            controller: _email,
-            enableSuggestions: false,
-            autocorrect: false,
-            //need make it specify email keyboard with @
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              hintText: 'Enter your email here',
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) async {
+        // registration exceptions
+        // --------------------------------
+        // check if registering
+        if (state is AuthStateRegistering) {
+          // weak password
+          if (state.exception is WeakPasswordAuthException) {
+            await showErrorDialouge(context,
+                'Your password appears to be weak please enter a more secure password!');
+            // email in use
+          } else if (state.exception is EmailAlreadyInUseAuthException) {
+            await showErrorDialouge(context,
+                'It appears this email is already in use try another email or login');
+            // invalid email
+          } else if (state.exception is InvalidEmailAuthException) {
+            await showErrorDialouge(
+                context, 'Email given is invalid please try another email');
+            // generic register exception
+          } else if (state.exception is GenericAuthException) {
+            await showErrorDialouge(context, 'Failed to register');
+          }
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Center(child: Text('Register')),
+        ),
+        body: (Column(
+          children: [
+            //grab these text fields when we click out button
+            //add hint to text field hint user what to input
+            TextField(
+              controller: _email,
+              enableSuggestions: false,
+              autocorrect: false,
+              //need make it specify email keyboard with @
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
+                hintText: 'Enter your email here',
+              ),
             ),
-          ),
 
-          //Password TextField Box to input pw
-          TextField(
-            //need to make pw field secure
-            controller: _password,
-            obscureText: true,
-            enableSuggestions: false,
-            autocorrect: false,
-            decoration: const InputDecoration(
-              hintText: 'Enter your password here',
+            //Password TextField Box to input pw
+            TextField(
+              //need to make pw field secure
+              controller: _password,
+              obscureText: true,
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration: const InputDecoration(
+                hintText: 'Enter your password here',
+              ),
             ),
-          ),
-          TextButton(
-            onPressed: () async {
-              // upoun pressing will get email and password from user
-              final email =
-                  _email.text; //.text concatenate as string its method
-              final password = _password.text;
-              // Now with firebase we create user 8:42 in video
-              // need to await keyword since returns a FUTURE async basically need to await for the data
-
-              // Now we need to create a exception for when user try to register and account already created as well
-              // Also the weak password exception
-              // Another exception to catch is invalid email as well
-              try {
-                await AuthService.firebase().createUser(
-                  email: email,
-                  password: password,
-                );
-                //once user able to register we want to show verify email route so that the user can verify email \
-                // using pushnamed and not remove
-                //Instead making user press button what if we configured for it to do so
-                await AuthService.firebase().sendEmailVerification();
-                Navigator.of(context).pushNamed(verifyEmailRoute);
-              } on WeakPasswordAuthException {
-                await showErrorDialouge(
-                  context,
-                  'Your password appears to be weak please enter a more secure password!',
-                );
-              } on EmailAlreadyInUseAuthException {
-                await showErrorDialouge(
-                  context,
-                  'It appears this email is already in use try another email or login',
-                );
-              } on InvalidEmailAuthException {
-                await showErrorDialouge(
-                  context,
-                  'Email given is invalid please try another email',
-                );
-              } on GenericAuthException {
-                await showErrorDialouge(
-                  context,
-                  'Failed to register',
-                );
-              }
-            },
-            child: const Text('Sign up'),
-          ),
-          // Create a already registered login here button that takes to the login view
-          TextButton(
-              onPressed: () {
-                Navigator.of(context)
-                    .pushNamedAndRemoveUntil(loginRoute, (route) => false);
+            TextButton(
+              onPressed: () async {
+                // upoun pressing will get email and password from user
+                final email =
+                    _email.text; //.text concatenate as string its method
+                final password = _password.text;
+                // use bloc to sign up
+                context.read<AuthBloc>().add(AuthEventRegister(
+                      email: email,
+                      password: password,
+                    ));
               },
-              child: const Text('Already Registered? Login Here!')),
-        ],
-      )),
+              child: const Text('Sign up'),
+            ),
+            // Create a already registered login here button that takes to the login view
+            TextButton(
+                onPressed: () {
+                  // bloc to login logout event so it can take us to login
+                  context.read<AuthBloc>().add(const AuthEventLogout());
+                },
+                child: const Text('Already Registered? Login Here!')),
+          ],
+        )),
+      ),
     );
   }
 }

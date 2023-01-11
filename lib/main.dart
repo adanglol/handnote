@@ -7,7 +7,6 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 // abstract firebase in UI code
-import 'package:hand_in_need/services/auth/auth_service.dart';
 import 'package:hand_in_need/services/auth/bloc/auth_bloc.dart';
 import 'package:hand_in_need/services/auth/bloc/auth_event.dart';
 import 'package:hand_in_need/services/auth/bloc/auth_state.dart';
@@ -61,10 +60,6 @@ void main() {
     // parameter called routes for linking different part of page like register and login
     // takes in map as argument
     routes: {
-      loginRoute: (context) => const LoginView(),
-      registerRoute: (context) => const RegisterView(),
-      notesRoute: (context) => const NotesView(),
-      verifyEmailRoute: (context) => const VerifyEmailView(),
       createOrUpdateNoteRoute: (context) => const CreateUpdateNoteView(),
     },
   ));
@@ -94,6 +89,9 @@ class HomePage extends StatelessWidget {
           // logged out
         } else if (state is AuthStateLoggedOut) {
           return const LoginView();
+          // if they are registering state
+        } else if (state is AuthStateRegistering) {
+          return const RegisterView();
         } else {
           // loading but can add other states in future
           return const Scaffold(

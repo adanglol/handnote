@@ -25,3 +25,25 @@ class AuthEventLogin extends AuthEvent {
 class AuthEventLogout extends AuthEvent {
   const AuthEventLogout();
 }
+
+// need a event within email verify view to send email verification we need move it to our event
+class AuthEventSendEmailVerification extends AuthEvent {
+  const AuthEventSendEmailVerification();
+}
+
+// need register event
+class AuthEventRegister extends AuthEvent {
+  // when we register we require email and password
+  final String email;
+  final String password;
+  // make these required
+  const AuthEventRegister({
+    required this.email,
+    required this.password,
+  });
+}
+
+// need should register event - means if havent really registered user
+class AuthEventShouldRegister extends AuthEvent {
+  const AuthEventShouldRegister();
+}

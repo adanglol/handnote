@@ -8,9 +8,9 @@
 // counter state is generic state and is abstract
 
 import 'package:flutter/material.dart';
-import 'package:hand_in_need/services/auth/auth_provider.dart';
 import 'package:hand_in_need/services/auth/auth_user.dart';
-
+// import equatable so we dont have to overrid hascode comparison compare classes
+import 'package:equatable/equatable.dart';
 // lets create our generic state
 // OUR STATES - outputs
 
@@ -20,12 +20,15 @@ abstract class AuthState {
   const AuthState();
 }
 
-// Loading state for our AuthState
-// can use the state of loading
-// use it for open application and is initializing
-// also use it for tapping login button in order login and communicate with firebase
-class AuthStateLoading extends AuthState {
-  const AuthStateLoading();
+// state show that firebase and auth is not initialized within our application
+class AuthStateUnintialized extends AuthState {
+  const AuthStateUnintialized();
+}
+
+// we need create registrating state when registering either goes well or some exceptions
+class AuthStateRegistering extends AuthState {
+  final Exception? exception;
+  const AuthStateRegistering(this.exception);
 }
 
 // Logged In State
@@ -45,14 +48,26 @@ class AuthStateNeedsVerification extends AuthState {
 }
 
 // logged out state
-// if we
-class AuthStateLoggedOut extends AuthState {
+// we can bring in equality using mixin because already have extend
+class AuthStateLoggedOut extends AuthState with EquatableMixin {
   final Exception? exception;
-  const AuthStateLoggedOut(this.exception);
-}
-
-// define our log out errors states
-class AuthStateLogoutFailure extends AuthState {
-  final Exception exception;
-  const AuthStateLogoutFailure(this.exception);
+  // three types of state of all same class
+  // ------------------
+  // no exception false
+  // no exception true
+  // exception false
+  // -----------------
+  // add flag isloading
+  // loading state as bool T/F
+  final bool isLoading;
+  const AuthStateLoggedOut({
+    required this.exception,
+    required this.isLoading,
+  });
+  // we need return list of properties when equatable package compares
+  // we have list that is computing exception and isloading
+  // reason equatable to help produce various mutations of authstate logged out
+  // those mutations with various exceptions and isloading need be distinguishable thats why
+  @override
+  List<Object?> get props => [exception, isLoading];
 }

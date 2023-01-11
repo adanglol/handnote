@@ -1,9 +1,12 @@
 //Now we will be working on email verification
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:developer' as console show log;
 
 import 'package:hand_in_need/constants/routes.dart';
 import 'package:hand_in_need/services/auth/auth_service.dart';
+import 'package:hand_in_need/services/auth/bloc/auth_bloc.dart';
+import 'package:hand_in_need/services/auth/bloc/auth_event.dart';
 
 class VerifyEmailView extends StatefulWidget {
   const VerifyEmailView({super.key});
@@ -28,18 +31,18 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
               "If you have not recieved an email verification yet press the button below to do so!"),
           // button will send email to verify user when pressed
           TextButton(
-              onPressed: () async {
-                await AuthService.firebase().sendEmailVerification();
+              onPressed: () {
+                //  send email verification - an event that comes from our Auth Bloc
+                context
+                    .read<AuthBloc>()
+                    .add(const AuthEventSendEmailVerification());
               },
               child: const Text('Send Email Verification')),
           // restart button
           TextButton(
-            onPressed: () async {
-              // Signing out our user when they click restart button
-              await AuthService.firebase().logOut();
-              // Take our user to register page
-              Navigator.of(context)
-                  .pushNamedAndRemoveUntil(registerRoute, (route) => false);
+            onPressed: () {
+              // log us out - event come from Auth Bloc
+              context.read<AuthBloc>().add(const AuthEventLogout());
             },
             child: const Center(
               child: Text('Restart'),

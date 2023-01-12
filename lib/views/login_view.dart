@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hand_in_need/constants/routes.dart';
 import 'package:hand_in_need/services/auth/auth_exceptions.dart';
 import 'package:hand_in_need/services/auth/bloc/auth_bloc.dart';
 import 'package:hand_in_need/services/auth/bloc/auth_event.dart';
@@ -24,8 +23,6 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
-  // keep hold of Close dialouge
-  CloseDialogue? _closeDialougeHandle;
 
   @override
   void initState() {
@@ -48,21 +45,6 @@ class _LoginViewState extends State<LoginView> {
         // handle exceptions here
         // UserNotFound , WrongPassword , and GenericAuth
         if (state is AuthStateLoggedOut) {
-          // looking at our close dialouge handle
-          final closeDialouge = _closeDialougeHandle;
-          // look at our state and if we have it and display correct behavior accordingly
-          // not loading now but were before
-          // sum it up loading logic
-          if (!state.isLoading && closeDialouge != null) {
-            // closing dialouge
-            closeDialouge();
-            _closeDialougeHandle = null;
-            // if state is loading and we dont have loading dialouge yet on screen we have to show it
-          } else if (state.isLoading && closeDialouge == null) {
-            // show dialouge loading
-            _closeDialougeHandle =
-                showLoadingDialouge(context: context, text: 'Loading...');
-          }
           if (state.exception is UserNotFoundAuthException ||
               state.exception is WrongPasswordAuthException) {
             await showErrorDialouge(context,

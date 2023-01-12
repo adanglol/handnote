@@ -40,5 +40,10 @@ CloseDialogue showLoadingDialouge({
   );
   // return function from our function
   // make function that can be invoked by others
+  // it pops current view of Navigator
+  // navigator cant know what it is popping like our loading dialouge
+  // messing with the navigation stack  which is not good
+  // time move to overlays
+
   return () => Navigator.of(context).pop();
 }

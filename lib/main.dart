@@ -6,6 +6,7 @@ import 'dart:developer' as console show log;
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hand_in_need/helpers/loading/loading_screen.dart';
 // abstract firebase in UI code
 import 'package:hand_in_need/services/auth/bloc/auth_bloc.dart';
 import 'package:hand_in_need/services/auth/bloc/auth_event.dart';
@@ -76,28 +77,44 @@ class HomePage extends StatelessWidget {
     // .add
     // initialized firebase
     context.read<AuthBloc>().add(const AuthEventInitialize());
-    // mark BlocBuilder with AuthBloc and AuthState
-    return BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, state) {
-        // depending on our state return different views within our application
-        // logged in
-        if (state is AuthStateLoggedIn) {
-          return const NotesView();
-          // need verify
-        } else if (state is AuthStateNeedsVerification) {
-          return const VerifyEmailView();
-          // logged out
-        } else if (state is AuthStateLoggedOut) {
-          return const LoginView();
-          // if they are registering state
-        } else if (state is AuthStateRegistering) {
-          return const RegisterView();
-        } else {
-          // loading but can add other states in future
-          return const Scaffold(
-            body: CircularProgressIndicator(),
+    // need blocConsuner
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        // handle loading
+        if (state.isLoading) {
+          LoadingScreen().show(
+            context: context,
+            text: state.loadingText ?? 'Please wait a moment',
           );
+        } else {
+          // if state not loading
+          LoadingScreen().hide();
         }
+      },
+      builder: (context, state) {
+        return BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, state) {
+            // depending on our state return different views within our application
+            // logged in
+            if (state is AuthStateLoggedIn) {
+              return const NotesView();
+              // need verify
+            } else if (state is AuthStateNeedsVerification) {
+              return const VerifyEmailView();
+              // logged out
+            } else if (state is AuthStateLoggedOut) {
+              return const LoginView();
+              // if they are registering state
+            } else if (state is AuthStateRegistering) {
+              return const RegisterView();
+            } else {
+              // loading but can add other states in future
+              return const Scaffold(
+                body: CircularProgressIndicator(),
+              );
+            }
+          },
+        );
       },
     );
   } // Build Context

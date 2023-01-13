@@ -2,6 +2,10 @@
 // show key word for import get only show specific part could come it handy for importing a lot stf stl
 // You can give alias with as and name ex as devtools
 // print can print a object but log cannot it needs to be a string so we use .toString method that every Object class has
+
+// Timestamp
+// 30:43
+
 import 'dart:developer' as console show log;
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +48,7 @@ import 'constants/routes.dart';
 
 // main function does not get called during hot reload
 
-// 29 : 48 TIME STAMP
+// 31:00 TIME STAMP
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MaterialApp(

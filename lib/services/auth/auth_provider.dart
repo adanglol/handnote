@@ -26,4 +26,6 @@ abstract class AuthProvider {
   // LogOut and send Email verification
   Future<void> logOut();
   Future<void> sendEmailVerification();
+  // also need send reset password func
+  Future<void> sendPasswordReset({required String toEmail});
 }

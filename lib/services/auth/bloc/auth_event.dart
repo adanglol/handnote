@@ -47,3 +47,10 @@ class AuthEventRegister extends AuthEvent {
 class AuthEventShouldRegister extends AuthEvent {
   const AuthEventShouldRegister();
 }
+
+// user forgot password event - means if user forgot password login we are going to restart it
+class AuthEventForgotPassword extends AuthEvent {
+  // we need grab user email so that we can send them one to reset
+  final String? email;
+  const AuthEventForgotPassword({this.email});
+}

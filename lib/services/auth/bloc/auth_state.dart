@@ -61,6 +61,23 @@ class AuthStateNeedsVerification extends AuthState {
       : super(isLoading: isLoading);
 }
 
+// need take care of user forgot password state
+class AuthStateForgotPassword extends AuthState {
+  // when in forgot password view
+  // 3 states
+  // user just landed (default)
+  // user sent reminder email (with exception an error)
+  final Exception? exception;
+  // user send reminder email (actuallly send)
+  final bool hasSendEmail;
+
+  const AuthStateForgotPassword(
+      {required this.exception,
+      required this.hasSendEmail,
+      required bool isLoading})
+      : super(isLoading: isLoading);
+}
+
 // logged out state
 // we can bring in equality using mixin because already have extend
 class AuthStateLoggedOut extends AuthState with EquatableMixin {

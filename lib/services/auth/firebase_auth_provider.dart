@@ -74,7 +74,7 @@ class FirebaseAuthProvider implements AuthProvider {
   }) async {
     try {
       // add a timer show loading before loggin in
-      await Future.delayed(const Duration(seconds: 3));
+      await Future.delayed(const Duration(seconds: 2));
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
@@ -119,6 +119,30 @@ class FirebaseAuthProvider implements AuthProvider {
     } else {
       // if user not logged in
       throw UserNotLoggedInAuthException();
+    }
+  }
+
+  @override
+  Future<void> sendPasswordReset({required String toEmail}) async {
+    try {
+      // try to send password reset through firebase
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: toEmail);
+      // firebase auth exception when trying reset password for our user
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        // email is invalid
+        case 'firebase_auth/invalid-email':
+          throw InvalidEmailAuthException();
+        // user not found within our application
+        case 'firebase_auth/user-not-found':
+          throw UserNotFoundAuthException();
+        // in any other case
+        default:
+          throw GenericAuthException();
+      }
+    } catch (_) {
+      //if anything happens during process of sending password reset email throw exception
+      throw GenericAuthException();
     }
   }
 } // Auth Provider

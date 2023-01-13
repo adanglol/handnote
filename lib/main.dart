@@ -12,6 +12,7 @@ import 'package:hand_in_need/services/auth/bloc/auth_bloc.dart';
 import 'package:hand_in_need/services/auth/bloc/auth_event.dart';
 import 'package:hand_in_need/services/auth/bloc/auth_state.dart';
 import 'package:hand_in_need/services/auth/firebase_auth_provider.dart';
+import 'package:hand_in_need/views/forgot_password_view.dart';
 // Register and Login View files for our App
 import 'package:hand_in_need/views/login_view.dart';
 import 'package:hand_in_need/views/notes/create_update_note_view.dart';
@@ -43,8 +44,7 @@ import 'constants/routes.dart';
 
 // main function does not get called during hot reload
 
-// 27:20 time stamp HEREHERE
-
+// 29 : 48 TIME STAMP
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MaterialApp(
@@ -107,6 +107,9 @@ class HomePage extends StatelessWidget {
               // if they are registering state
             } else if (state is AuthStateRegistering) {
               return const RegisterView();
+              // forgot password
+            } else if (state is AuthStateForgotPassword) {
+              return const ForgotPasswordView();
             } else {
               // loading but can add other states in future
               return const Scaffold(

@@ -90,65 +90,69 @@ class _RegisterViewState extends State<RegisterView> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: (Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                  'Enter your email and password to begin creating notes'),
-              //grab these text fields when we click out button
-              //add hint to text field hint user what to input
-              TextField(
-                controller: _email,
-                enableSuggestions: false,
-                autocorrect: false,
-                autofocus: true,
-                //need make it specify email keyboard with @
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  hintText: 'Enter your email here',
+          child: SingleChildScrollView(
+            child: (Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                    'Enter your email and password to begin creating notes'),
+                //grab these text fields when we click out button
+                //add hint to text field hint user what to input
+                TextField(
+                  controller: _email,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  autofocus: true,
+                  //need make it specify email keyboard with @
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(
+                    hintText: 'Enter your email here',
+                  ),
                 ),
-              ),
 
-              //Password TextField Box to input pw
-              TextField(
-                //need to make pw field secure
-                controller: _password,
-                obscureText: true,
-                enableSuggestions: false,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  hintText: 'Enter your password here',
+                //Password TextField Box to input pw
+                TextField(
+                  //need to make pw field secure
+                  controller: _password,
+                  obscureText: true,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  decoration: const InputDecoration(
+                    hintText: 'Enter your password here',
+                  ),
                 ),
-              ),
-              Center(
-                child: Column(
-                  children: [
-                    TextButton(
-                      onPressed: () async {
-                        // upoun pressing will get email and password from user
-                        final email = _email
-                            .text; //.text concatenate as string its method
-                        final password = _password.text;
-                        // use bloc to sign up
-                        context.read<AuthBloc>().add(AuthEventRegister(
-                              email: email,
-                              password: password,
-                            ));
-                      },
-                      child: const Text('Sign up'),
-                    ),
-                    // Create a already registered login here button that takes to the login view
-                    TextButton(
-                        onPressed: () {
-                          // bloc to login logout event so it can take us to login
-                          context.read<AuthBloc>().add(const AuthEventLogout());
+                Center(
+                  child: Column(
+                    children: [
+                      TextButton(
+                        onPressed: () async {
+                          // upoun pressing will get email and password from user
+                          final email = _email
+                              .text; //.text concatenate as string its method
+                          final password = _password.text;
+                          // use bloc to sign up
+                          context.read<AuthBloc>().add(AuthEventRegister(
+                                email: email,
+                                password: password,
+                              ));
                         },
-                        child: const Text('Already Registered? Login Here!')),
-                  ],
+                        child: const Text('Sign up'),
+                      ),
+                      // Create a already registered login here button that takes to the login view
+                      TextButton(
+                          onPressed: () {
+                            // bloc to login logout event so it can take us to login
+                            context
+                                .read<AuthBloc>()
+                                .add(const AuthEventLogout());
+                          },
+                          child: const Text('Already Registered? Login Here!')),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          )),
+              ],
+            )),
+          ),
         ),
       ),
     );

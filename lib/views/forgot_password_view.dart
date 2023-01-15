@@ -60,36 +60,38 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              const Text(
-                  'If you forgot your password no worries. Just enter your email below and we will send a email to reset your password'),
-              TextField(
-                controller: _email,
-                keyboardType: TextInputType.emailAddress,
-                autocorrect: false,
-                autofocus: true,
-                decoration:
-                    const InputDecoration(hintText: 'Your email address...'),
-              ),
-              TextButton(
-                onPressed: () {
-                  // where when we press button go to our auth bloc and pass forgot email and pass controller text
-                  final email = _email.text;
-                  context
-                      .read<AuthBloc>()
-                      .add(AuthEventForgotPassword(email: email));
-                },
-                child: const Text('Send Password Reset Link'),
-              ),
-              // Textbutton to take our user to login screen after resetting email
-              TextButton(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const Text(
+                    'If you forgot your password no worries. Just enter your email below and we will send a email to reset your password'),
+                TextField(
+                  controller: _email,
+                  keyboardType: TextInputType.emailAddress,
+                  autocorrect: false,
+                  autofocus: true,
+                  decoration:
+                      const InputDecoration(hintText: 'Your email address...'),
+                ),
+                TextButton(
                   onPressed: () {
-                    // send user back to login view of our application so that they can login upoun reset their password
-                    context.read<AuthBloc>().add(const AuthEventLogout());
+                    // where when we press button go to our auth bloc and pass forgot email and pass controller text
+                    final email = _email.text;
+                    context
+                        .read<AuthBloc>()
+                        .add(AuthEventForgotPassword(email: email));
                   },
-                  child: const Text('Back to Login')),
-            ],
+                  child: const Text('Send Password Reset Link'),
+                ),
+                // Textbutton to take our user to login screen after resetting email
+                TextButton(
+                    onPressed: () {
+                      // send user back to login view of our application so that they can login upoun reset their password
+                      context.read<AuthBloc>().add(const AuthEventLogout());
+                    },
+                    child: const Text('Back to Login')),
+              ],
+            ),
           ),
         ),
       ),

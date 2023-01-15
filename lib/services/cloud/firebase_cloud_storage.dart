@@ -56,32 +56,13 @@ class FirebaseCloudStorage {
     // want to grab stream of data as its evolving wanna be able subscribe all changed want use snapshot
     // get takes snapshot at that point in time and returns
     // want be updated live need subscribe
-    return notes.snapshots().map((event) => event.docs
-        .map((doc) => CloudNote.fromSnapshot(doc))
+    final allNotes = notes
         // where clause is exposing user notes wiht user without it exposes all user notes to user
-        .where((note) => note.ownerUserId == ownerUserId));
-  }
-
-  // function allows to get notes by user id
-  Future<Iterable<CloudNote>> getNotes({required String ownerUserId}) async {
-    try {
-      return await notes
-          .where(
-            ownerUserIdFieldName,
-            isEqualTo: ownerUserId,
-            // query data
-          )
-          .get()
-          // returns value of that future and allow return synchronoous val or another future
-          .then(
-            (value) => value.docs.map(
-              // grab doc from cloudnote snapshot
-              (doc) => CloudNote.fromSnapshot(doc),
-            ),
-          );
-    } catch (e) {
-      throw CouldNotGetAllNotesException();
-    }
+        // filter before we get result of stream which is all our notes security reasons
+        .where(ownerUserIdFieldName, isEqualTo: ownerUserId)
+        .snapshots()
+        .map((event) => event.docs.map((doc) => CloudNote.fromSnapshot(doc)));
+    return allNotes;
   }
 
   // creating a singleton

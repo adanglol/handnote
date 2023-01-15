@@ -23,32 +23,34 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
       appBar: AppBar(
         title: const Text('Verify Email'),
       ),
-      body: Column(
-        children: [
-          const Text(
-              "We've sent an email verification. Please open in order to verify your account"),
-          const Text(
-              "If you have not recieved an email verification yet press the button below to do so!"),
-          // button will send email to verify user when pressed
-          TextButton(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const Text(
+                "We've sent an email verification. Please open in order to verify your account"),
+            const Text(
+                "If you have not recieved an email verification yet press the button below to do so!"),
+            // button will send email to verify user when pressed
+            TextButton(
+                onPressed: () {
+                  //  send email verification - an event that comes from our Auth Bloc
+                  context
+                      .read<AuthBloc>()
+                      .add(const AuthEventSendEmailVerification());
+                },
+                child: const Text('Send Email Verification')),
+            // restart button
+            TextButton(
               onPressed: () {
-                //  send email verification - an event that comes from our Auth Bloc
-                context
-                    .read<AuthBloc>()
-                    .add(const AuthEventSendEmailVerification());
+                // log us out - event come from Auth Bloc
+                context.read<AuthBloc>().add(const AuthEventLogout());
               },
-              child: const Text('Send Email Verification')),
-          // restart button
-          TextButton(
-            onPressed: () {
-              // log us out - event come from Auth Bloc
-              context.read<AuthBloc>().add(const AuthEventLogout());
-            },
-            child: const Center(
-              child: Text('Restart'),
+              child: const Center(
+                child: Text('Restart'),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

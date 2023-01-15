@@ -60,66 +60,72 @@ class _LoginViewState extends State<LoginView> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: (Column(
-            children: [
-              const Text(
-                  'Please Login to your account so you can start creating notes and interact with'),
-              TextField(
-                controller: _email,
-                enableSuggestions: false,
-                autocorrect: false,
-                autofocus: true,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  hintText: 'Enter your email here',
+          child: SingleChildScrollView(
+            child: (Column(
+              children: [
+                const Text(
+                    'Please Login to your account so you can start creating notes and interact with'),
+                TextField(
+                  controller: _email,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  autofocus: true,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(
+                    hintText: 'Enter your email here',
+                  ),
                 ),
-              ),
-              TextField(
-                controller: _password,
-                obscureText: true,
-                enableSuggestions: false,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  hintText: 'Enter your password here',
+                TextField(
+                  controller: _password,
+                  obscureText: true,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  decoration: const InputDecoration(
+                    hintText: 'Enter your password here',
+                  ),
                 ),
-              ),
 
-              //For our Login view instead of creating instance of user email pw we need to login
-              // need implement bloc listener for our exceptions when trying to login
-              TextButton(
-                onPressed: () async {
-                  final email = _email.text;
-                  final password = _password.text;
-                  // use context for authbloc
-                  // using bloc to login and seperate our logic
-                  context.read<AuthBloc>().add(AuthEventLogin(email, password));
-                },
-                child: const Text('Login'),
-              ),
-
-              // Create a new Text button that will direct us to our register view to sign up
-              // Name Routes Navigator and push and MaterialPageRoute
-              // Route its journey with start and end with start and end with view
-              // 2 types of routes - either new screen anon route , Named route tell about route before so when app created it knows there is route goes to certain screen
-
-              //We need to define a register and login route for our app
-              TextButton(
-                  onPressed: () {
-                    // grab auth bloc
+                //For our Login view instead of creating instance of user email pw we need to login
+                // need implement bloc listener for our exceptions when trying to login
+                TextButton(
+                  onPressed: () async {
+                    final email = _email.text;
+                    final password = _password.text;
+                    // use context for authbloc
+                    // using bloc to login and seperate our logic
                     context
                         .read<AuthBloc>()
-                        .add(const AuthEventShouldRegister());
+                        .add(AuthEventLogin(email, password));
                   },
-                  child: const Text('Not Registered yet? Register Here!')),
-              // add a button so that if user forgot password give them option to
-              TextButton(
-                onPressed: () {
-                  context.read<AuthBloc>().add(const AuthEventForgotPassword());
-                },
-                child: const Text('Forgot Password?'),
-              )
-            ],
-          )),
+                  child: const Text('Login'),
+                ),
+
+                // Create a new Text button that will direct us to our register view to sign up
+                // Name Routes Navigator and push and MaterialPageRoute
+                // Route its journey with start and end with start and end with view
+                // 2 types of routes - either new screen anon route , Named route tell about route before so when app created it knows there is route goes to certain screen
+
+                //We need to define a register and login route for our app
+                TextButton(
+                    onPressed: () {
+                      // grab auth bloc
+                      context
+                          .read<AuthBloc>()
+                          .add(const AuthEventShouldRegister());
+                    },
+                    child: const Text('Not Registered yet? Register Here!')),
+                // add a button so that if user forgot password give them option to
+                TextButton(
+                  onPressed: () {
+                    context
+                        .read<AuthBloc>()
+                        .add(const AuthEventForgotPassword());
+                  },
+                  child: const Text('Forgot Password?'),
+                )
+              ],
+            )),
+          ),
         ),
       ),
     );
